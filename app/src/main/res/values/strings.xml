@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Popular Movies</string>
+    <string name="highest_rated">Top Rated</string>
+    <string name="most_popular">Newest</string>
+    <string name="base_image_url">http://image.tmdb.org/t/p/</string>
+    <string name="image_size">w185</string>
+
+    <string name="color_background">color background</string>
+    <string name="poster_thumbnail">movie poster thumbnail</string>
+    <string name="release_date_label">Release Date</string>
+    <string name="vote_average_label">Vote Average</string>
+    <string name="overview_label">Overview</string>
+    <string name="reviews_label">User Reviews</string>
+    <string name="network_unavailable">Network connection is not available. Please try again later.</string>
+
+    <string name="trailer_label">Trailers</string>
+    <string name="review_author_label">Username</string>
+    <string name="trailer_thumbnail">Trailer</string>
+
+    <!--tools:text data-->
+    <string name="test_movieTitle">Fight Club</string>
+    <string name="test_releaseDate">1999-10-15</string>
+    <string name="test_rating">8.3</string>
+    <string name="test_overview">A ticking-time-bomb insomniac and a slippery soap salesman channel primal male aggression into a shocking new form of therapy. Their concept catches on, with underground \'fight clubs' forming in every town, until an eccentric gets in the way and ignites an out-of-control spiral toward oblivion.</string>
+    <string name="test_review_author">Goddard</string>
+    <string name="test_review_content">Pretty awesome movie.  It shows what one crazy person can convince other crazy people to do.  Everyone needs something to believe in.  I recommend Jesus Christ, but they want Tyler Durden.</string>
+    <string name="test_trailer_name">Fight Club Trailer - HD</string>
+    <string name="test_trailer_key">SUXWAEX2jlg</string>
+</resources>
