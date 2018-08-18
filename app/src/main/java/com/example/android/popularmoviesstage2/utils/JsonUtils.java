@@ -23,10 +23,10 @@ import java.nio.charset.Charset;
 
 public class JsonUtils {
 
-    private static final String SAMPLE_MOVIE_QUERY = "https://api.themoviedb.org/3/movie/550?api_key=ccb621025458c323746b303c8db124ce&language=en-US";
-    private static final String SAMPLE_REVIEW_QUERY = "https://api.themoviedb.org/3/movie/550/reviews?api_key=ccb621025458c323746b303c8db124ce&language=en-US";
-    private static final String SAMPLE_TRAILER_QUERY = "https://api.themoviedb.org/3/movie/550/videos?api_key=ccb621025458c323746b303c8db124ce&language=en-US";
-    private static final String SAMPLE_QUERY = "https://api.themoviedb.org/3/movie/popular?api_key=ccb621025458c323746b303c8db124ce&language=en-US";
+//    private static final String SAMPLE_MOVIE_QUERY = "https://api.themoviedb.org/3/movie/550?api_key=ccb621025458c323746b303c8db124ce&language=en-US";
+//    private static final String SAMPLE_REVIEW_QUERY = "https://api.themoviedb.org/3/movie/550/reviews?api_key=ccb621025458c323746b303c8db124ce&language=en-US";
+//    private static final String SAMPLE_TRAILER_QUERY = "https://api.themoviedb.org/3/movie/550/videos?api_key=ccb621025458c323746b303c8db124ce&language=en-US";
+//    private static final String SAMPLE_QUERY = "https://api.themoviedb.org/3/movie/popular?api_key=ccb621025458c323746b303c8db124ce&language=en-US";
 
     private static final String BASE_URL = "https://api.themoviedb.org/3/movie/";
     private static final String BASE_TRAILER_URL = "https://youtu.be/";
