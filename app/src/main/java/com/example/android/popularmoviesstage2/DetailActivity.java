@@ -1,34 +1,32 @@
 package com.example.android.popularmoviesstage2;
 
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.android.popularmoviesstage2.adapters.ReviewAdapter;
 import com.example.android.popularmoviesstage2.adapters.TrailerAdapter;
+import com.example.android.popularmoviesstage2.database.AppExecutors;
+import com.example.android.popularmoviesstage2.database.FavoriteDatabase;
 import com.example.android.popularmoviesstage2.interfaces.OnReviewTaskCompleted;
 import com.example.android.popularmoviesstage2.interfaces.OnTrailerTaskCompleted;
 import com.example.android.popularmoviesstage2.model.Movie;
 import com.example.android.popularmoviesstage2.model.Review;
 import com.example.android.popularmoviesstage2.model.Trailer;
-import com.example.android.popularmoviesstage2.utils.JsonUtils;
+import com.example.android.popularmoviesstage2.utils.NetworkUtils;
 import com.example.android.popularmoviesstage2.utils.ReviewAsyncTask;
 import com.example.android.popularmoviesstage2.utils.TrailerAsyncTask;
 import com.squareup.picasso.Picasso;
 
-//public class DetailActivity extends AppCompatActivity implements ReviewAdapter.ItemClickListener {
 public class DetailActivity extends AppCompatActivity implements TrailerAdapter.TrailerListener {
 
     private static final String LOG_TAG = DetailActivity.class.getSimpleName();
@@ -38,11 +36,16 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     private RecyclerView rvTrailer;
     private Review[] mReviews = null;
     private Trailer[] mTrailers = null;
+    private FloatingActionButton fabFavorite;
+    private FavoriteDatabase mDb;
+    private int favorite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+
+        mDb = FavoriteDatabase.getInstance(getApplicationContext());
 
         String mBaseImagePath = getString(R.string.base_image_url);
         String mImageSize = getString(R.string.image_size);
@@ -52,6 +55,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         TextView mOverview = findViewById(R.id.overview_tv);
         TextView mRating = findViewById(R.id.rating_tv);
         TextView mDate = findViewById(R.id.releaseDate_tv);
+        fabFavorite = findViewById(R.id.favorites_fab);
 
         Intent intent = getIntent();
         Movie movie = intent.getParcelableExtra("movie");
@@ -62,6 +66,10 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         rvTrailer = findViewById(R.id.trailers_rv);
         rvTrailer.setLayoutManager(new LinearLayoutManager(this));
         movieId = movie.getId();
+
+        if (movie.getFavorite() == 1) {
+            fabFavorite.setImageDrawable(ContextCompat.getDrawable(DetailActivity.this, R.drawable.ic_favorite_added_24dp));
+        }
 
         mTitle.setText(movie.getOriginalTitle());
         mOverview.setText(movie.getOverview());
@@ -77,37 +85,65 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             Picasso.with(this).load(mPosterPath).into(mMovieImage);
         }
 
-        if (checkConnection()) {
+        if (NetworkUtils.checkConnection(this)) {
             ReviewAsyncTask reviewTask = new ReviewAsyncTask(new ReviewListener(), movieId);
             reviewTask.execute();
         } else {
-            noConnection();
+            NetworkUtils.noConnection(this);
         }
 
-        if (checkConnection()) {
+        if (NetworkUtils.checkConnection(this)) {
             TrailerAsyncTask trailerTask = new TrailerAsyncTask(new TrailerListener(), movieId);
             trailerTask.execute();
+        } else {
+            NetworkUtils.noConnection(this);
         }
+        final Movie mMovie = movie;
+        fabFavorite.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                updateFavorites(mMovie);
+            }
+        });
+    }
+
+    private void updateFavorites(final Movie movie) {
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                int alreadyExists = mDb.movieDao().loadMovieById(movie.getId());
+                if (alreadyExists == 0) {
+                    mDb.movieDao().insertFavorite(movie);
+                    movie.setFavorite(1);
+                } else {
+                    mDb.movieDao().deleteFavorite(movie);
+                    movie.setFavorite(0);
+                }
+                updateIcon(movie.getFavorite());
+            }
+        });
+    }
+
+    private void updateIcon(final int fav) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (fav == 1) {
+                    fabFavorite.setImageDrawable(ContextCompat.getDrawable(DetailActivity.this, R.drawable.ic_favorite_added_24dp));
+                } else {
+                    fabFavorite.setImageDrawable(ContextCompat.getDrawable(DetailActivity.this, R.drawable.ic_favorite_default_24dp));
+                }
+            }
+        });
     }
 
     public void onItemClick(int position) {
         Log.d(LOG_TAG,"===> mTrailer[position] = " + mTrailers[position].getName());
         startTrailer(mTrailers[position]);
-//        startDetailActivity(mMovies[position]);
     }
 
-    private boolean checkConnection() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-
-        boolean isConnected = ((activeNetwork != null) && (activeNetwork.isConnectedOrConnecting()));
-        return isConnected;
-    }
-
-    private void noConnection() {
-        Toast toast = Toast.makeText(getApplicationContext(), R.string.network_unavailable, Toast.LENGTH_LONG);
-        toast.setGravity(Gravity.CENTER, 0, 0);
-        toast.show();
+    public void updateFavorites() {
     }
 
     private class TrailerListener implements OnTrailerTaskCompleted {

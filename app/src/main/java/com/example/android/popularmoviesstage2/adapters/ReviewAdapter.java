@@ -13,7 +13,7 @@ import com.example.android.popularmoviesstage2.model.Review;
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder> {
 
     private static final String LOG_TAG = ReviewAdapter.class.getSimpleName();
-    private Review[] mReview;
+    private final Review[] mReview;
     private TextView mAuthor;
     private TextView mContent;
 

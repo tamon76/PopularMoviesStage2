@@ -17,6 +17,12 @@
     <string name="review_author_label">Username</string>
     <string name="trailer_thumbnail">Trailer</string>
 
+    <!--Menu-->
+    <string name="show_favorites">Favorite</string>
+    <string name="show_popular">Popular</string>
+    <string name="show_top_rated">Top Rated</string>
+    <string name="sort">Sort</string>
+
     <!--tools:text data-->
     <string name="test_movieTitle">Fight Club</string>
     <string name="test_releaseDate">1999-10-15</string>

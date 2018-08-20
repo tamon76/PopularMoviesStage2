@@ -3,7 +3,6 @@ package com.example.android.popularmoviesstage2.adapters;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,10 +17,10 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHold
 
     private static final String LOG_TAG = TrailerAdapter.class.getSimpleName();
     private static final String BASE_THUMBNAIL_URL = "http://img.youtube.com/vi/";
-    private Trailer[] mTrailers;
+    private final Trailer[] mTrailers;
     private TextView mName;
-    private Context context;
-    private TrailerListener trailerListener;
+    private final Context context;
+    private final TrailerListener trailerListener;
 
     public TrailerAdapter(Context context, TrailerListener trailerListener, Trailer[] trailers) {
         this.mTrailers = trailers;

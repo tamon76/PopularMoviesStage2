@@ -1,15 +1,31 @@
 package com.example.android.popularmoviesstage2.model;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
+@Entity(tableName = "favorites")
 public class Movie implements Parcelable {
+    @PrimaryKey
+    @NonNull
+    @ColumnInfo(name="id")
     private String mId;
+    @ColumnInfo(name="title")
     private String mOriginalTitle;
+    @ColumnInfo(name = "image")
     private String mThumbnailPath;
+    @ColumnInfo(name = "overview")
     private String mOverview;
+    @ColumnInfo(name = "rating")
     private String mVoteAverage;
+    @ColumnInfo(name = "release_date")
     private String mReleaseDate;
+    @Ignore
+    private int mFavorite = 0;
 
     public Movie() {
 
@@ -40,6 +56,10 @@ public class Movie implements Parcelable {
         mReleaseDate = releaseDate;
     }
 
+    public void setFavorite(int favorite) {
+        mFavorite = favorite;
+    }
+
 
     //Getter methods
     public String getId() {
@@ -66,6 +86,10 @@ public class Movie implements Parcelable {
         return mReleaseDate;
     }
 
+    public int getFavorite() {
+        return mFavorite;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -79,6 +103,7 @@ public class Movie implements Parcelable {
         dest.writeString(mOverview);
         dest.writeString(mVoteAverage);
         dest.writeString(mReleaseDate);
+        dest.writeInt(mFavorite);
 
     }
 
@@ -89,6 +114,7 @@ public class Movie implements Parcelable {
         mOverview = source.readString();
         mVoteAverage = source.readString();
         mReleaseDate = source.readString();
+        mFavorite = source.readInt();
     }
 
     public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
