@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     private static final String SORT_RATING = "top_rated";
     private static final String SORT_FAVORITES = "favorites";
     private static final String BASE_URL = "http://api.themoviedb.org/3/movie/";
+    public static final String KEY_MOVIE = "movie";
 
     private String sortBy = SORT_POPULAR;
     private FavoriteDatabase mDb;
@@ -56,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
     private void startDetailActivity(Movie movie) {
         Intent intent = new Intent(this, DetailActivity.class);
-        intent.putExtra("movie", movie);
+        intent.putExtra(KEY_MOVIE, movie);
         startActivity(intent);
     }
 

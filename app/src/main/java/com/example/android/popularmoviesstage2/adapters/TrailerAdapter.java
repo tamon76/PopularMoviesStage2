@@ -21,6 +21,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHold
     private TextView mName;
     private final Context context;
     private final TrailerListener trailerListener;
+    private final String KEY_THUMBNAIL = "/hqdefault.jpg";
 
     public TrailerAdapter(Context context, TrailerListener trailerListener, Trailer[] trailers) {
         this.mTrailers = trailers;
@@ -40,7 +41,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
         String name = mTrailers[position].getName();
         String key = mTrailers[position].getKey();
-        String thumbnail = BASE_THUMBNAIL_URL + key + "/hqdefault.jpg";
+        String thumbnail = BASE_THUMBNAIL_URL + key + KEY_THUMBNAIL;
         mName.setText(name);
         Picasso.with(context).load(thumbnail).into(viewHolder.trailerView);
     }

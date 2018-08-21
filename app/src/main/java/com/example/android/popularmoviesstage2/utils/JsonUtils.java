@@ -32,6 +32,10 @@ class JsonUtils {
     private static final String API_KEY = BuildConfig.API_KEY;
     private static final String LOG_TAG = JsonUtils.class.getSimpleName();
 
+    private static final String KEY_API = "api_key";
+    private static final String KEY_REVIEWS = "reviews";
+    private static final String KEY_VIDEOS = "videos";
+
     private static String makeHttpRequest(URL url) throws IOException {
         String jsonResponse = "";
 
@@ -95,7 +99,7 @@ class JsonUtils {
             Uri builtUri = Uri.parse(BASE_URL)
                     .buildUpon()
                     .appendPath(sortOrder)
-                    .appendQueryParameter("api_key", API_KEY)
+                    .appendQueryParameter(KEY_API, API_KEY)
                     .build();
 
             return new URL(builtUri.toString());
@@ -179,8 +183,8 @@ class JsonUtils {
             Uri builtUri = Uri.parse(BASE_URL)
                     .buildUpon()
                     .appendPath(movieId)
-                    .appendPath("reviews")
-                    .appendQueryParameter("api_key", API_KEY)
+                    .appendPath(KEY_REVIEWS)
+                    .appendQueryParameter(KEY_API, API_KEY)
                     .build();
 
             return new URL(builtUri.toString());
@@ -251,8 +255,8 @@ class JsonUtils {
             Uri builtUri = Uri.parse(BASE_URL)
                     .buildUpon()
                     .appendPath(movieId)
-                    .appendPath("videos")
-                    .appendQueryParameter("api_key", API_KEY)
+                    .appendPath(KEY_VIDEOS)
+                    .appendQueryParameter(KEY_API, API_KEY)
                     .build();
 
             return new URL(builtUri.toString());

@@ -8,7 +8,11 @@ import android.widget.Toast;
 
 import com.example.android.popularmoviesstage2.R;
 
-public class NetworkUtils {
+public final class NetworkUtils {
+
+    private NetworkUtils() {
+
+    }
 
     public static boolean checkConnection(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);

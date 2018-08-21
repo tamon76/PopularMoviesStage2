@@ -39,6 +39,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     private FloatingActionButton fabFavorite;
     private FavoriteDatabase mDb;
     private int favorite;
+    public static final String KEY_MOVIE = "movie";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +59,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         fabFavorite = findViewById(R.id.favorites_fab);
 
         Intent intent = getIntent();
-        Movie movie = intent.getParcelableExtra("movie");
+        Movie movie = intent.getParcelableExtra(KEY_MOVIE);
 
         rvReview = findViewById(R.id.reviews_rv);
         rvReview.setLayoutManager(new LinearLayoutManager(this));
