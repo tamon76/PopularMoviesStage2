@@ -1,6 +1,9 @@
 package com.example.android.popularmoviesstage2;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -11,20 +14,19 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.example.android.popularmoviesstage2.adapters.FavoriteAdapter;
 import com.example.android.popularmoviesstage2.adapters.MovieAdapter;
-import com.example.android.popularmoviesstage2.database.FavoriteDatabase;
-import com.example.android.popularmoviesstage2.interfaces.OnFavoriteTaskCompleted;
-import com.example.android.popularmoviesstage2.model.Movie;
 import com.example.android.popularmoviesstage2.interfaces.OnMovieTaskCompleted;
-import com.example.android.popularmoviesstage2.utils.FavoriteAsyncTask;
+import com.example.android.popularmoviesstage2.model.FavoriteViewModel;
 import com.example.android.popularmoviesstage2.utils.MovieAsyncTask;
 import com.example.android.popularmoviesstage2.utils.NetworkUtils;
+import com.example.android.popularmoviesstage2.model.Movie;
 
-public class MainActivity extends AppCompatActivity implements MovieAdapter.ItemClickListener, FavoriteAdapter.ItemClickListener {
+
+public class MainActivity extends AppCompatActivity implements MovieAdapter.ItemClickListener {
 
     private RecyclerView mRecyclerView;
     private Movie[] mMovies = null;
+    private FavoriteViewModel mViewModel;
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private static final String SORT_POPULAR = "popular";
@@ -32,11 +34,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     private static final String SORT_FAVORITES = "favorites";
     private static final String BASE_URL = "http://api.themoviedb.org/3/movie/";
     public static final String KEY_MOVIE = "movie";
+    public static final String KEY_SORT_BY = "key_sortBy";
+    public static final String KEY_SORTED_MOVIES = "movieList";
 
     private String sortBy = SORT_POPULAR;
-    private FavoriteDatabase mDb;
-    private FavoriteAdapter mFavoriteAdapter;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,12 +48,27 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         mRecyclerView = findViewById(R.id.movies_rv);
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(KEY_SORT_BY)) {
+                sortBy = savedInstanceState.getString(KEY_SORT_BY);
+            }
+        }
+
         if (NetworkUtils.checkConnection(this)) {
+
             connect();
         } else {
             NetworkUtils.noConnection(this);
         }
-        mDb = FavoriteDatabase.getInstance(getApplicationContext());
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        String savedSort = sortBy;
+
+        outState.putString(KEY_SORT_BY, savedSort);
+        outState.putParcelable(KEY_SORTED_MOVIES, mRecyclerView.getLayoutManager().onSaveInstanceState());
     }
 
     private void startDetailActivity(Movie movie) {
@@ -89,8 +105,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
             case R.id.favorites:
                 sortBy = SORT_FAVORITES;
-                FavoriteAsyncTask task = new FavoriteAsyncTask(new FavoriteListener(), mDb);
-                task.execute();
+                populateFavorites();
                 break;
 
             default:
@@ -108,15 +123,17 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         task.execute(BASE_URL);
     }
 
-    private class FavoriteListener implements OnFavoriteTaskCompleted {
-        @Override
-        public void onFavoriteTaskCompleted(Movie[] movies) {
-            mRecyclerView.setVisibility(View.VISIBLE);
-            mMovies = movies;
-            FavoriteAdapter mFavoriteAdapter;
-            mFavoriteAdapter = new FavoriteAdapter(MainActivity.this, MainActivity.this, mMovies);
-            mRecyclerView.setAdapter(mFavoriteAdapter);
-        }
+    private void populateFavorites() {
+        mViewModel = ViewModelProviders.of(this).get(FavoriteViewModel.class);
+        final MovieAdapter favoriteAdapter;
+        favoriteAdapter = new MovieAdapter(MainActivity.this, MainActivity.this, mMovies);
+        mRecyclerView.setAdapter(favoriteAdapter);
+        mViewModel.getFavoriteList().observe(MainActivity.this, new Observer<Movie[]>() {
+            @Override
+            public void onChanged(@Nullable Movie[] favorites) {
+                favoriteAdapter.addMovie(favorites);
+            }
+        });
     }
 
     private class MovieListener implements OnMovieTaskCompleted {

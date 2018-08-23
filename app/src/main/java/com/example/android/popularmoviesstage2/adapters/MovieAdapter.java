@@ -18,7 +18,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     private static final String SIZE = "w185";
     private final ItemClickListener mClickListener;
 
-    private final Movie[] movies;
+    private Movie[] movies;
     private final Context context;
 
     public MovieAdapter(Context context, ItemClickListener itemClickListener, Movie[] movies) {
@@ -64,6 +64,11 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
                 mClickListener.onItemClick(getAdapterPosition());
             }
         }
+    }
+
+    public void addMovie(Movie[] movies) {
+        this.movies = movies;
+        notifyDataSetChanged();
     }
 
     @Override

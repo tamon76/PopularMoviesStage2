@@ -18,7 +18,9 @@ public class FavoriteAsyncTask extends AsyncTask<String, Void, Movie[]> {
 
     @Override
     protected Movie[] doInBackground(String... strings) {
-        return mDb.movieDao().loadFavorites();
+//        return mDb.movieDao().loadFavorites();
+        Movie[] movies = null;
+        return movies;
     }
 
     @Override

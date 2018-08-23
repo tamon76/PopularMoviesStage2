@@ -38,7 +38,8 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     private Trailer[] mTrailers = null;
     private FloatingActionButton fabFavorite;
     private FavoriteDatabase mDb;
-    private int favorite;
+    private Movie movie;
+    private boolean isFavorite;
     public static final String KEY_MOVIE = "movie";
 
     @Override
@@ -59,23 +60,19 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         fabFavorite = findViewById(R.id.favorites_fab);
 
         Intent intent = getIntent();
-        Movie movie = intent.getParcelableExtra(KEY_MOVIE);
+        movie = intent.getParcelableExtra(KEY_MOVIE);
 
         rvReview = findViewById(R.id.reviews_rv);
         rvReview.setLayoutManager(new LinearLayoutManager(this));
 
         rvTrailer = findViewById(R.id.trailers_rv);
         rvTrailer.setLayoutManager(new LinearLayoutManager(this));
-        movieId = movie.getId();
-
-        if (movie.getFavorite() == 1) {
-            fabFavorite.setImageDrawable(ContextCompat.getDrawable(DetailActivity.this, R.drawable.ic_favorite_added_24dp));
-        }
 
         mTitle.setText(movie.getOriginalTitle());
         mOverview.setText(movie.getOverview());
         mRating.setText(movie.getVoteAverage());
         mDate.setText(movie.getReleaseDate());
+        movieId = movie.getId();
 
         String mPosterPath = movie.getThumbnailPath();
 
@@ -99,52 +96,60 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         } else {
             NetworkUtils.noConnection(this);
         }
-        final Movie mMovie = movie;
-        fabFavorite.setOnClickListener(new View.OnClickListener() {
+//        final Movie mMovie = movie;
 
+        fabFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                updateFavorites(mMovie);
+                updateFavorites(movie);
             }
         });
+
+        checkFavorite(movie);
     }
 
-    private void updateFavorites(final Movie movie) {
+    private void checkFavorite(final Movie movie) {
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                int alreadyExists = mDb.movieDao().loadMovieById(movie.getId());
-                if (alreadyExists == 0) {
-                    mDb.movieDao().insertFavorite(movie);
-                    movie.setFavorite(1);
-                } else {
-                    mDb.movieDao().deleteFavorite(movie);
-                    movie.setFavorite(0);
-                }
-                updateIcon(movie.getFavorite());
-            }
-        });
-    }
-
-    private void updateIcon(final int fav) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (fav == 1) {
+                String movieId = mDb.movieDao().loadMovieById(movie.getId());
+                if (movieId != null) {
+                    isFavorite = true;
                     fabFavorite.setImageDrawable(ContextCompat.getDrawable(DetailActivity.this, R.drawable.ic_favorite_added_24dp));
                 } else {
+                    isFavorite = false;
                     fabFavorite.setImageDrawable(ContextCompat.getDrawable(DetailActivity.this, R.drawable.ic_favorite_default_24dp));
                 }
             }
         });
     }
 
+    private void updateFavorites(final Movie movie) {
+        if (isFavorite) {
+            AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    mDb.movieDao().deleteFavorite(movie);
+                }
+            });
+            isFavorite = false;
+            fabFavorite.setImageDrawable(ContextCompat.getDrawable(DetailActivity.this, R.drawable.ic_favorite_default_24dp));
+
+        } else {
+            AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    mDb.movieDao().addFavorite(movie);
+                }
+            });
+            isFavorite = true;
+            fabFavorite.setImageDrawable(ContextCompat.getDrawable(DetailActivity.this, R.drawable.ic_favorite_added_24dp));
+        }
+    }
+
     public void onItemClick(int position) {
         Log.d(LOG_TAG,"===> mTrailer[position] = " + mTrailers[position].getName());
         startTrailer(mTrailers[position]);
-    }
-
-    public void updateFavorites() {
     }
 
     private class TrailerListener implements OnTrailerTaskCompleted {

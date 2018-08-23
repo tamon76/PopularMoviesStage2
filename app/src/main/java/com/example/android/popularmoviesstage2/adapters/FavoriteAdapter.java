@@ -2,7 +2,6 @@ package com.example.android.popularmoviesstage2.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,15 +17,14 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
     private static final String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
     private static final String SIZE = "w185";
 
-    private FloatingActionButton favorite;
     private final Context mContext;
     private Movie[] mFavorites;
     final private ItemClickListener mListener;
 
     public FavoriteAdapter(Context context, ItemClickListener listener, Movie[] movies) {
-        mContext = context;
-        mListener = listener;
-        mFavorites = movies;
+        this.mContext = context;
+        this.mListener = listener;
+        this.mFavorites = movies;
     }
 
     @NonNull
@@ -49,6 +47,19 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
         }
     }
 
+    @Override
+    public int getItemCount() {
+        if (mFavorites == null) {
+            return 0;
+        }
+        return mFavorites.length;
+    }
+
+    public void addMovie(Movie[] movies) {
+        this.mFavorites = movies;
+        notifyDataSetChanged();
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final ImageView posterView;
 
@@ -64,23 +75,6 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
                 mListener.onItemClick(getAdapterPosition());
             }
         }
-    }
-
-    @Override
-    public int getItemCount() {
-        if (mFavorites == null) {
-            return 0;
-        }
-        return mFavorites.length;
-    }
-
-    public Movie[] getFavorites() {
-        return mFavorites;
-    }
-
-    public void setFavorites(Movie[] movies) {
-        mFavorites = movies;
-        notifyDataSetChanged();
     }
 
     public interface ItemClickListener {

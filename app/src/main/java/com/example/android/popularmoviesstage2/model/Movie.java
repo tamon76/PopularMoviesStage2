@@ -24,8 +24,6 @@ public class Movie implements Parcelable {
     private String mVoteAverage;
     @ColumnInfo(name = "release_date")
     private String mReleaseDate;
-    @Ignore
-    private int mFavorite = 0;
 
     public Movie() {
 
@@ -56,11 +54,6 @@ public class Movie implements Parcelable {
         mReleaseDate = releaseDate;
     }
 
-    public void setFavorite(int favorite) {
-        mFavorite = favorite;
-    }
-
-
     //Getter methods
     public String getId() {
         return mId;
@@ -86,10 +79,6 @@ public class Movie implements Parcelable {
         return mReleaseDate;
     }
 
-    public int getFavorite() {
-        return mFavorite;
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -103,8 +92,6 @@ public class Movie implements Parcelable {
         dest.writeString(mOverview);
         dest.writeString(mVoteAverage);
         dest.writeString(mReleaseDate);
-        dest.writeInt(mFavorite);
-
     }
 
     private Movie(Parcel source) {
@@ -114,7 +101,6 @@ public class Movie implements Parcelable {
         mOverview = source.readString();
         mVoteAverage = source.readString();
         mReleaseDate = source.readString();
-        mFavorite = source.readInt();
     }
 
     public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
