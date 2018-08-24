@@ -13,12 +13,14 @@ import com.example.android.popularmoviesstage2.R;
 import com.example.android.popularmoviesstage2.model.Trailer;
 import com.squareup.picasso.Picasso;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHolder> {
 
     private static final String LOG_TAG = TrailerAdapter.class.getSimpleName();
     private static final String BASE_THUMBNAIL_URL = "http://img.youtube.com/vi/";
     private final Trailer[] mTrailers;
-    private TextView mName;
     private final Context context;
     private final TrailerListener trailerListener;
     private final String KEY_THUMBNAIL = "/hqdefault.jpg";
@@ -42,18 +44,17 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHold
         String name = mTrailers[position].getName();
         String key = mTrailers[position].getKey();
         String thumbnail = BASE_THUMBNAIL_URL + key + KEY_THUMBNAIL;
-        mName.setText(name);
+        viewHolder.trailerName.setText(name);
         Picasso.with(context).load(thumbnail).into(viewHolder.trailerView);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        @BindView(R.id.trailerKey_iv) ImageView trailerView;
+        @BindView(R.id.trailerName_tv) TextView trailerName;
 
-        private final ImageView trailerView;
-
-        private ViewHolder(View itemLayoutView) {
-            super(itemLayoutView);
-            mName = itemView.findViewById(R.id.trailerName_tv);
-            trailerView = itemLayoutView.findViewById(R.id.trailerKey_iv);
+        private ViewHolder(View view) {
+            super(view);
+            ButterKnife.bind(this, view);
             trailerView.setOnClickListener(this);
         }
 

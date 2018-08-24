@@ -27,16 +27,26 @@ import com.example.android.popularmoviesstage2.utils.ReviewAsyncTask;
 import com.example.android.popularmoviesstage2.utils.TrailerAsyncTask;
 import com.squareup.picasso.Picasso;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class DetailActivity extends AppCompatActivity implements TrailerAdapter.TrailerListener {
+
+    @BindView(R.id.movieTitle_tv) TextView mTitle;
+    @BindView(R.id.movieImage_iv) ImageView mMovieImage;
+    @BindView(R.id.overview_tv) TextView mOverview;
+    @BindView(R.id.rating_tv) TextView mRating;
+    @BindView(R.id.releaseDate_tv) TextView mDate;
+    @BindView(R.id.favorites_fab) FloatingActionButton fabFavorite;
+
+    @BindView(R.id.trailers_rv) RecyclerView rvTrailer;
+    @BindView(R.id.reviews_rv) RecyclerView rvReview;
 
     private static final String LOG_TAG = DetailActivity.class.getSimpleName();
     private static final String BASE_TRAILER_URL = "https://www.youtube.com/watch?v=";
     private String movieId;
-    private RecyclerView rvReview;
-    private RecyclerView rvTrailer;
     private Review[] mReviews = null;
     private Trailer[] mTrailers = null;
-    private FloatingActionButton fabFavorite;
     private FavoriteDatabase mDb;
     private Movie movie;
     private boolean isFavorite;
@@ -46,26 +56,17 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+        ButterKnife.bind(this);
 
         mDb = FavoriteDatabase.getInstance(getApplicationContext());
 
         String mBaseImagePath = getString(R.string.base_image_url);
         String mImageSize = getString(R.string.image_size);
 
-        TextView mTitle = findViewById(R.id.movieTitle_tv);
-        ImageView mMovieImage = findViewById(R.id.movieImage_iv);
-        TextView mOverview = findViewById(R.id.overview_tv);
-        TextView mRating = findViewById(R.id.rating_tv);
-        TextView mDate = findViewById(R.id.releaseDate_tv);
-        fabFavorite = findViewById(R.id.favorites_fab);
-
         Intent intent = getIntent();
         movie = intent.getParcelableExtra(KEY_MOVIE);
 
-        rvReview = findViewById(R.id.reviews_rv);
         rvReview.setLayoutManager(new LinearLayoutManager(this));
-
-        rvTrailer = findViewById(R.id.trailers_rv);
         rvTrailer.setLayoutManager(new LinearLayoutManager(this));
 
         mTitle.setText(movie.getOriginalTitle());
@@ -96,7 +97,6 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         } else {
             NetworkUtils.noConnection(this);
         }
-//        final Movie mMovie = movie;
 
         fabFavorite.setOnClickListener(new View.OnClickListener() {
             @Override

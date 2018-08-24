@@ -10,12 +10,13 @@ import android.widget.TextView;
 import com.example.android.popularmoviesstage2.R;
 import com.example.android.popularmoviesstage2.model.Review;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder> {
 
     private static final String LOG_TAG = ReviewAdapter.class.getSimpleName();
     private final Review[] mReview;
-    private TextView mAuthor;
-    private TextView mContent;
 
     public ReviewAdapter(Review[] review) {
         this.mReview = review;
@@ -30,19 +31,20 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ReviewAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ReviewAdapter.ViewHolder viewHolder, int position) {
         String author = mReview[position].getAuthor();
         String content = mReview[position].getContent();
-        mAuthor.setText(author);
-        mContent.setText(content);
+        viewHolder.mAuthor.setText(author);
+        viewHolder.mContent.setText(content);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.author_tv) TextView mAuthor;
+        @BindView(R.id.content_tv) TextView mContent;
 
-        private ViewHolder(View itemLayoutView) {
-            super(itemLayoutView);
-            mAuthor = itemView.findViewById(R.id.author_tv);
-            mContent = itemView.findViewById(R.id.content_tv);
+        private ViewHolder(View view) {
+            super(view);
+            ButterKnife.bind(this, view);
         }
     }
 

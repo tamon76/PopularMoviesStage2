@@ -21,10 +21,14 @@ import com.example.android.popularmoviesstage2.utils.MovieAsyncTask;
 import com.example.android.popularmoviesstage2.utils.NetworkUtils;
 import com.example.android.popularmoviesstage2.model.Movie;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.ItemClickListener {
 
-    private RecyclerView mRecyclerView;
+    @BindView(R.id.movies_rv) RecyclerView mRecyclerView;
+
     private Movie[] mMovies = null;
     private FavoriteViewModel mViewModel;
 
@@ -43,9 +47,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
         //Set up the RecyclerView
-        mRecyclerView = findViewById(R.id.movies_rv);
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 
         if (savedInstanceState != null) {

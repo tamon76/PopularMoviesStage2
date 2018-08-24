@@ -12,6 +12,9 @@ import com.example.android.popularmoviesstage2.R;
 import com.example.android.popularmoviesstage2.model.Movie;
 import com.squareup.picasso.Picasso;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHolder> {
 
     private static final String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
@@ -61,11 +64,11 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private final ImageView posterView;
+        @BindView(R.id.thumbnail_iv) ImageView posterView;
 
         private ViewHolder(View view) {
             super(view);
-            posterView = view.findViewById(R.id.thumbnail_iv);
+            ButterKnife.bind(this, view);
             view.setOnClickListener(this);
         }
 

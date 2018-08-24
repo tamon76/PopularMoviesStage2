@@ -26,6 +26,11 @@ android {
 }
 
 dependencies {
+    def BUTTER_KNIFE_VERSION="8.5.1" //current version of butterknife
+
+    //Butterknife
+    implementation "com.jakewharton:butterknife:$BUTTER_KNIFE_VERSION"
+    annotationProcessor "com.jakewharton:butterknife-compiler:$BUTTER_KNIFE_VERSION"
 
     //Room dependencies
     implementation "android.arch.persistence.room:runtime:1.0.0"
