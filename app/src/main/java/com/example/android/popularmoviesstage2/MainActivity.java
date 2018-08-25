@@ -67,6 +67,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        populateFavorites();
+
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         String savedSort = sortBy;
