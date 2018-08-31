@@ -3,8 +3,14 @@ package com.example.android.popularmoviesstage2.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Trailer implements Parcelable {
+
+    @SerializedName("name")
     private String mName;
+
+    @SerializedName("key")
     private String mKey;
 
     public Trailer() {

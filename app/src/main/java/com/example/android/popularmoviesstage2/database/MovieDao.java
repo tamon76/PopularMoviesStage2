@@ -8,6 +8,8 @@ import android.arch.persistence.room.Query;
 
 import com.example.android.popularmoviesstage2.model.Movie;
 
+import java.util.List;
+
 @Dao
 public interface MovieDao {
 
@@ -18,7 +20,7 @@ public interface MovieDao {
     void deleteFavorite(Movie movie);
 
     @Query("SELECT * FROM favorites")
-    LiveData<Movie[]> loadFavorites();
+    LiveData<List<Movie>> loadFavorites();
 
     @Query("SELECT ID FROM favorites WHERE id = :movieId")
     String loadMovieById(String movieId);

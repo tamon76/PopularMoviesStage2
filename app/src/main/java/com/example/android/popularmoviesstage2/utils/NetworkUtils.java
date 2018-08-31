@@ -18,8 +18,7 @@ public final class NetworkUtils {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
 
-        boolean isConnected = ((activeNetwork != null) && (activeNetwork.isConnectedOrConnecting()));
-        return isConnected;
+        return  ((activeNetwork != null) && (activeNetwork.isConnectedOrConnecting()));
     }
 
     public static void noConnection(Context context) {

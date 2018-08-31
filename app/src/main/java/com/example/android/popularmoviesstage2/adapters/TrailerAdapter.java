@@ -1,6 +1,8 @@
 package com.example.android.popularmoviesstage2.adapters;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,65 +15,71 @@ import com.example.android.popularmoviesstage2.R;
 import com.example.android.popularmoviesstage2.model.Trailer;
 import com.squareup.picasso.Picasso;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.ViewHolder> {
+public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerHolder> {
 
-    private static final String LOG_TAG = TrailerAdapter.class.getSimpleName();
+    private static final String BASE_TRAILER_URL = "https://www.youtube.com/watch?v=";
     private static final String BASE_THUMBNAIL_URL = "http://img.youtube.com/vi/";
-    private final Trailer[] mTrailers;
-    private final Context context;
-    private final TrailerListener trailerListener;
-    private final String KEY_THUMBNAIL = "/hqdefault.jpg";
+    private final List<Trailer> mTrailers;
+    private Context context;
+    private static final String KEY_THUMBNAIL = "/hqdefault.jpg";
 
-    public TrailerAdapter(Context context, TrailerListener trailerListener, Trailer[] trailers) {
+    public TrailerAdapter(List<Trailer> trailers) {
         this.mTrailers = trailers;
-        this.context = context;
-        this.trailerListener = trailerListener;
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public TrailerHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.movie_trailer, parent, false);
-        return new ViewHolder(view);
+        return new TrailerHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
-        String name = mTrailers[position].getName();
-        String key = mTrailers[position].getKey();
+    public void onBindViewHolder(@NonNull TrailerHolder viewHolder, int position) {
+        final Trailer trailer = mTrailers.get(position);
+        String name = trailer.getName();
+        String key = trailer.getKey();
         String thumbnail = BASE_THUMBNAIL_URL + key + KEY_THUMBNAIL;
         viewHolder.trailerName.setText(name);
-        Picasso.with(context).load(thumbnail).into(viewHolder.trailerView);
+        Picasso.get().load(thumbnail).into(viewHolder.trailerView);
+
+        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startTrailer(trailer);
+            }
+        });
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class TrailerHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.trailerKey_iv) ImageView trailerView;
         @BindView(R.id.trailerName_tv) TextView trailerName;
 
-        private ViewHolder(View view) {
+        private TrailerHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
-            trailerView.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View view) {
-            if (trailerListener != null) {
-                trailerListener.onItemClick(getAdapterPosition());
-            }
         }
     }
 
     @Override
     public int getItemCount() {
-        return mTrailers.length;
+        if (mTrailers == null) {
+            return 0;
+        }
+        return mTrailers.size();
     }
 
-    public interface TrailerListener {
-        void onItemClick(int position);
+    private void startTrailer(Trailer trailer) {
+        String url = BASE_TRAILER_URL + trailer.getKey();
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url));
+        context.startActivity(intent);
     }
 }

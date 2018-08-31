@@ -1,6 +1,5 @@
 package com.example.android.popularmoviesstage2.adapters;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,69 +7,35 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.example.android.popularmoviesstage2.interfaces.MovieListener;
 import com.example.android.popularmoviesstage2.model.Movie;
 import com.example.android.popularmoviesstage2.R;
 import com.squareup.picasso.Picasso;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
+public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
     private static final String SIZE = "w185";
-    private final ItemClickListener mClickListener;
+    private final MovieListener mClickListener;
+    final private List<Movie> movies;
 
-    private Movie[] movies;
-    private final Context context;
-
-    public MovieAdapter(Context context, ItemClickListener itemClickListener, Movie[] movies) {
+    public MovieAdapter(List<Movie> movies, MovieListener listener) {
         this.movies = movies;
-        this.context = context;
-        this.mClickListener = itemClickListener;
+        this.mClickListener = listener;
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.grid_item, parent, false);
 
-        return new ViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
-        String poster = movies[position].getThumbnailPath();
-        String posterPath = BASE_IMAGE_URL + SIZE + poster;
-
-        if (poster.equals("null")) {
-            viewHolder.posterView.setImageResource(R.drawable.film_reel);
-        } else {
-            Picasso.with(context).load(posterPath).into(viewHolder.posterView);
-        }
-    }
-
-    public class ViewHolder extends RecyclerView.ViewHolder implements  View.OnClickListener {
-        @BindView(R.id.thumbnail_iv) ImageView posterView;
-
-        private ViewHolder(View view) {
-            super(view);
-            ButterKnife.bind(this, view);
-            view.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View view) {
-            if (mClickListener != null) {
-                mClickListener.onItemClick(getAdapterPosition());
-            }
-        }
-    }
-
-    public void addMovie(Movie[] movies) {
-        this.movies = movies;
-        notifyDataSetChanged();
+        return new MovieHolder(view);
     }
 
     @Override
@@ -78,10 +43,45 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         if (movies == null) {
             return 0;
         }
-        return movies.length;
+        return movies.size();
     }
 
-    public interface ItemClickListener {
-        void onItemClick(int position);
+    @Override
+    public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder, final int position) {
+        final Movie movie = movies.get(position);
+        String poster = movie.getThumbnailPath();
+        String posterPath = BASE_IMAGE_URL + SIZE + poster;
+
+        if (poster.equals("null")) {
+            ((MovieHolder) viewHolder).posterView.setImageResource(R.drawable.film_reel);
+        } else {
+            Picasso.get().load(posterPath).into(((MovieHolder) viewHolder).posterView);
+        }
+        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mClickListener.onMovieClick(movie
+                );
+            }
+        });
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
+    static class MovieHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.thumbnail_iv) ImageView posterView;
+
+        private MovieHolder(View view) {
+            super(view);
+            ButterKnife.bind(this, view);
+        }
     }
 }

@@ -101,7 +101,7 @@
             <TextView
                 android:id="@+id/rating_tv"
                 android:layout_width="wrap_content"
-                android:layout_height="0dp"
+                android:layout_height="30dp"
                 android:layout_marginBottom="72dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
@@ -139,13 +139,27 @@
                 app:layout_constraintTop_toBottomOf="@+id/overviewLabel_tv"
                 tools:text="@string/test_overview" />
 
+            <ImageView
+                android:id="@+id/trailerBackground"
+                android:layout_width="0dp"
+                android:layout_height="25dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/colorAccent"
+                android:contentDescription="@string/color_background"
+                app:layout_constraintBottom_toTopOf="@+id/trailers_rv"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/overview_tv" />
+
             <TextView
                 android:id="@+id/trailerLabel_tv"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:text="@string/trailer_label"
-                android:textSize="18sp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead.Inverse"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/overview_tv" />
@@ -160,13 +174,28 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/trailerLabel_tv" />
 
+
+            <ImageView
+                android:id="@+id/reviewBackground"
+                android:layout_width="0dp"
+                android:layout_height="25dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/colorAccent"
+                android:contentDescription="@string/color_background"
+                app:layout_constraintBottom_toTopOf="@+id/reviews_rv"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/trailers_rv" />
+
             <TextView
                 android:id="@+id/reviewLabel_tv"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:text="@string/reviews_label"
-                android:textSize="18sp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead.Inverse"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/trailers_rv" />
@@ -190,8 +219,6 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="16dp"
-        android:clickable="true"
-        android:onClick="updateFavorites"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:src="@drawable/ic_favorite_default_24dp" />

@@ -3,29 +3,35 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/menu_sort"
-        android:orderInCategory="1"
+        android:id="@+id/spinner"
         android:title="@string/sort"
-        app:showAsAction="ifRoom">
-        <menu>
+        app:actionViewClass="android.widget.Spinner"
+        app:showAsAction="always" />
 
-            <item
-                android:orderInCategory="1"
-                android:id="@+id/popular"
-                android:title="@string/show_popular"
-                app:showAsAction="ifRoom" />
+    <!--<item-->
+        <!--android:id="@+id/menu_sort"-->
+        <!--android:orderInCategory="1"-->
+        <!--android:title="@string/sort"-->
+        <!--app:showAsAction="ifRoom">-->
+        <!--<menu>-->
 
-            <item
-                android:orderInCategory="2"
-                android:id="@+id/rated"
-                android:title="@string/show_top_rated"
-                app:showAsAction="ifRoom" />
+            <!--<item-->
+                <!--android:orderInCategory="1"-->
+                <!--android:id="@+id/popular"-->
+                <!--android:title="@string/show_popular"-->
+                <!--app:showAsAction="ifRoom" />-->
 
-            <item
-                android:orderInCategory="2"
-                android:id="@+id/favorites"
-                android:title="@string/show_favorites"
-                app:showAsAction="ifRoom" />
-        </menu>
-    </item>
+            <!--<item-->
+                <!--android:orderInCategory="2"-->
+                <!--android:id="@+id/rated"-->
+                <!--android:title="@string/show_top_rated"-->
+                <!--app:showAsAction="ifRoom" />-->
+
+            <!--<item-->
+                <!--android:orderInCategory="2"-->
+                <!--android:id="@+id/favorites"-->
+                <!--android:title="@string/show_favorites"-->
+                <!--app:showAsAction="ifRoom" />-->
+        <!--</menu>-->
+    <!--</item>-->
 </menu>

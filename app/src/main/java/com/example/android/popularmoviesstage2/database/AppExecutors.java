@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+@SuppressWarnings("FieldCanBeLocal")
 public class AppExecutors {
 
     private static final Object LOCK = new Object();

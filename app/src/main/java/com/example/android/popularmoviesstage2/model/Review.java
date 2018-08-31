@@ -3,9 +3,17 @@ package com.example.android.popularmoviesstage2.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Review implements Parcelable {
+
+    @SerializedName("id")
     private String mId;
+
+    @SerializedName("author")
     private String mAuthor;
+
+    @SerializedName("content")
     private String mContent;
 
     public Review() {

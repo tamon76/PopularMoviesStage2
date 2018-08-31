@@ -18,14 +18,14 @@
     <string name="trailer_thumbnail">Trailer</string>
 
     <!--Menu-->
+    <string name="sort">Sort</string>
     <string name="show_favorites">Favorite</string>
     <string name="show_popular">Popular</string>
     <string name="show_top_rated">Top Rated</string>
-    <string name="sort">Sort</string>
 
     <!--tools:text data-->
     <string name="test_movieTitle">Fight Club</string>
-    <string name="test_releaseDate">1999-10-15</string>
+    <string name="test_releaseDate">1999–10–15</string>
     <string name="test_rating">8.3</string>
     <string name="test_overview">A ticking-time-bomb insomniac and a slippery soap salesman channel primal male aggression into a shocking new form of therapy. Their concept catches on, with underground \'fight clubs' forming in every town, until an eccentric gets in the way and ignites an out-of-control spiral toward oblivion.</string>
     <string name="test_review_author">Goddard</string>

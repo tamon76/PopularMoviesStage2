@@ -1,14 +1,13 @@
 package com.example.android.popularmoviesstage2;
 
 import android.content.Intent;
-import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -17,20 +16,26 @@ import com.example.android.popularmoviesstage2.adapters.ReviewAdapter;
 import com.example.android.popularmoviesstage2.adapters.TrailerAdapter;
 import com.example.android.popularmoviesstage2.database.AppExecutors;
 import com.example.android.popularmoviesstage2.database.FavoriteDatabase;
-import com.example.android.popularmoviesstage2.interfaces.OnReviewTaskCompleted;
-import com.example.android.popularmoviesstage2.interfaces.OnTrailerTaskCompleted;
+import com.example.android.popularmoviesstage2.interfaces.GetMovieService;
 import com.example.android.popularmoviesstage2.model.Movie;
 import com.example.android.popularmoviesstage2.model.Review;
+import com.example.android.popularmoviesstage2.model.ReviewResponse;
 import com.example.android.popularmoviesstage2.model.Trailer;
+import com.example.android.popularmoviesstage2.model.TrailerResponse;
 import com.example.android.popularmoviesstage2.utils.NetworkUtils;
-import com.example.android.popularmoviesstage2.utils.ReviewAsyncTask;
-import com.example.android.popularmoviesstage2.utils.TrailerAsyncTask;
+import com.example.android.popularmoviesstage2.utils.RetrofitClientInstance;
 import com.squareup.picasso.Picasso;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-public class DetailActivity extends AppCompatActivity implements TrailerAdapter.TrailerListener {
+@SuppressWarnings("WeakerAccess")
+public class DetailActivity extends AppCompatActivity {
 
     @BindView(R.id.movieTitle_tv) TextView mTitle;
     @BindView(R.id.movieImage_iv) ImageView mMovieImage;
@@ -42,15 +47,10 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     @BindView(R.id.trailers_rv) RecyclerView rvTrailer;
     @BindView(R.id.reviews_rv) RecyclerView rvReview;
 
-    private static final String LOG_TAG = DetailActivity.class.getSimpleName();
-    private static final String BASE_TRAILER_URL = "https://www.youtube.com/watch?v=";
-    private String movieId;
-    private Review[] mReviews = null;
-    private Trailer[] mTrailers = null;
     private FavoriteDatabase mDb;
     private Movie movie;
     private boolean isFavorite;
-    public static final String KEY_MOVIE = "movie";
+    public static final String KEY_MOVIE = "key_movie";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +73,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         mOverview.setText(movie.getOverview());
         mRating.setText(movie.getVoteAverage());
         mDate.setText(movie.getReleaseDate());
-        movieId = movie.getId();
+        String movieId = movie.getId();
 
         String mPosterPath = movie.getThumbnailPath();
 
@@ -81,19 +81,18 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             mMovieImage.setImageResource(R.drawable.film_reel);
         } else {
             mPosterPath = mBaseImagePath + mImageSize + mPosterPath;
-            Picasso.with(this).load(mPosterPath).into(mMovieImage);
+            Picasso.get().load(mPosterPath).into(mMovieImage);
         }
 
         if (NetworkUtils.checkConnection(this)) {
-            ReviewAsyncTask reviewTask = new ReviewAsyncTask(new ReviewListener(), movieId);
-            reviewTask.execute();
+            loadReviews(movieId);
         } else {
             NetworkUtils.noConnection(this);
         }
 
         if (NetworkUtils.checkConnection(this)) {
-            TrailerAsyncTask trailerTask = new TrailerAsyncTask(new TrailerListener(), movieId);
-            trailerTask.execute();
+            loadTrailers(movieId);
+
         } else {
             NetworkUtils.noConnection(this);
         }
@@ -147,38 +146,58 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         }
     }
 
-    public void onItemClick(int position) {
-        Log.d(LOG_TAG,"===> mTrailer[position] = " + mTrailers[position].getName());
-        startTrailer(mTrailers[position]);
-    }
+    private void loadReviews(String movieId) {
+        GetMovieService service = RetrofitClientInstance.getRetrofitInstance().create(GetMovieService.class);
+        Call<ReviewResponse> call = service.getReviews(movieId, BuildConfig.API_KEY);
+        if (call != null) {
+            call.enqueue(new Callback<ReviewResponse>() {
+                @Override
+                public void onResponse(@NonNull Call<ReviewResponse> call, @NonNull Response<ReviewResponse> response) {
+                    if (response.isSuccessful()) {
+                        ReviewResponse reviewResponse = response.body();
+                        List<Review> reviews = reviewResponse.getResults();
 
-    private class TrailerListener implements OnTrailerTaskCompleted {
-        @Override
-        public void onTrailerTaskCompleted(Trailer[] trailers) {
-            rvTrailer.setVisibility(View.VISIBLE);
-            mTrailers = trailers;
-            TrailerAdapter mTrailerAdapter;
-            mTrailerAdapter = new TrailerAdapter(DetailActivity.this, DetailActivity.this, mTrailers);
-            rvTrailer.setAdapter(mTrailerAdapter);
+                        if ((reviews != null) && (reviews.size() > 0)) {
+                            ReviewAdapter mReviewAdapter;
+                            mReviewAdapter = new ReviewAdapter(reviews);
+                            rvReview.setAdapter(mReviewAdapter);
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<ReviewResponse> call, @NonNull Throwable t) {
+                    NetworkUtils.noConnection(DetailActivity.this);
+                }
+            });
         }
     }
 
-    private class ReviewListener implements OnReviewTaskCompleted {
-        @Override
-        public void onReviewTaskCompleted(Review[] reviews) {
-            rvReview.setVisibility(View.VISIBLE);
-            mReviews = reviews;
-            ReviewAdapter mReviewAdapter;
-            mReviewAdapter = new ReviewAdapter(mReviews);
-            rvReview.setAdapter(mReviewAdapter);
-        }
-    }
+    private void loadTrailers(String movieId) {
+        GetMovieService service = RetrofitClientInstance.getRetrofitInstance().create(GetMovieService.class);
+        Call <TrailerResponse> call = service.getTrailers(movieId, BuildConfig.API_KEY);
+        if (call != null) {
+            call.enqueue(new Callback<TrailerResponse>() {
+                @Override
+                public void onResponse(@NonNull Call<TrailerResponse> call, @NonNull Response<TrailerResponse> response) {
+                    if (response.isSuccessful()) {
+                        TrailerResponse trailerResponse = response.body();
+                        List<Trailer> trailers = trailerResponse.getResults();
 
-    private void startTrailer(Trailer trailer) {
-        String url = BASE_TRAILER_URL + trailer.getKey();
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(url));
-        startActivity(intent);
+                        if ((trailers != null) && (trailers.size() > 0)) {
+                            TrailerAdapter mTrailerAdapter;
+                            mTrailerAdapter = new TrailerAdapter(trailers);
+                            rvTrailer.setAdapter(mTrailerAdapter);
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<TrailerResponse> call, @NonNull Throwable t) {
+                    NetworkUtils.noConnection(DetailActivity.this);
+                }
+            });
+        }
     }
 }
 

@@ -2,28 +2,51 @@ package com.example.android.popularmoviesstage2.model;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import com.google.gson.annotations.SerializedName;
+
 @Entity(tableName = "favorites")
 public class Movie implements Parcelable {
+
     @PrimaryKey
     @NonNull
     @ColumnInfo(name="id")
+    @SerializedName("id")
     private String mId;
+
     @ColumnInfo(name="title")
+    @SerializedName("original_title")
     private String mOriginalTitle;
+
     @ColumnInfo(name = "image")
+    @SerializedName("poster_path")
     private String mThumbnailPath;
+
     @ColumnInfo(name = "overview")
+    @SerializedName("overview")
     private String mOverview;
+
     @ColumnInfo(name = "rating")
+    @SerializedName("vote_average")
     private String mVoteAverage;
+
     @ColumnInfo(name = "release_date")
+    @SerializedName("release_date")
     private String mReleaseDate;
+
+    public Movie(String posterPath, String overview, String releaseDate, @NonNull String id,
+                 String originalTitle, String voteAverage) {
+        this.mThumbnailPath = posterPath;
+        this.mOverview = overview;
+        this.mReleaseDate = releaseDate;
+        this.mId = id;
+        this.mOriginalTitle = originalTitle;
+        this.mVoteAverage = voteAverage;
+    }
 
     public Movie() {
 
