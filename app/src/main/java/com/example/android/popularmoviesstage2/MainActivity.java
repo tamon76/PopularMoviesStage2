@@ -280,7 +280,6 @@ public class MainActivity extends AppCompatActivity implements MovieListener, Ad
             Parcelable listState = mBundleViewState.getParcelable(KEY_LAYOUT_STATE);
             mRecyclerView.getLayoutManager().onRestoreInstanceState(listState);
         }
-
     }
 
     @Override
