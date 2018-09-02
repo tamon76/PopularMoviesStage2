@@ -63,8 +63,9 @@ public class MainActivity extends AppCompatActivity implements MovieListener, Ad
 
     public static final String KEY_LAYOUT_STATE = "key_layout_state";
     public static final String KEY_ADAPTER_POSITION = "key_adapter_position";
-    public static final String KEY_MOVIE = "key_movie";
     public static final String KEY_SPINNER_VALUE = "key_spinnerValue";
+    public static final String KEY_MOVIE = "key_movie";
+
 
     private String sortBy = SORT_POPULAR;
 
