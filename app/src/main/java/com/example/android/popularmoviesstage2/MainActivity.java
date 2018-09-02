@@ -4,12 +4,14 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,7 +24,6 @@ import com.example.android.popularmoviesstage2.adapters.MovieAdapter;
 import com.example.android.popularmoviesstage2.database.MainViewModel;
 import com.example.android.popularmoviesstage2.interfaces.GetMovieService;
 import com.example.android.popularmoviesstage2.interfaces.MovieListener;
-import com.example.android.popularmoviesstage2.model.GridAutofitLayoutManager;
 import com.example.android.popularmoviesstage2.model.MovieResponse;
 import com.example.android.popularmoviesstage2.utils.NetworkUtils;
 import com.example.android.popularmoviesstage2.model.Movie;
@@ -46,17 +47,23 @@ public class MainActivity extends AppCompatActivity implements MovieListener, Ad
     public static List<Movie> favoriteMovies;
     private MainViewModel mViewModel;
     private MovieAdapter mAdapter;
-    SharedPreferences mPreferences;
+    private SharedPreferences mPreferences;
+    private Parcelable mState;
 
-    private int selectedPosition;
+    private int mSortMethod;
+    private int mAdapterPosition = 0;
+
+    private static Bundle mBundleViewState;
+    private GridLayoutManager mLayoutManager;
 
     public static final String SORT_PREFERENCE = "SortPreference";
     public static final String SORT_POPULAR = "popular";
     public static final String SORT_RATING = "top_rated";
     private static final String SORT_FAVORITES = "favorites";
+
+    public static final String KEY_LAYOUT_STATE = "key_layout_state";
+    public static final String KEY_ADAPTER_POSITION = "key_adapter_position";
     public static final String KEY_MOVIE = "key_movie";
-    public static final String KEY_SORT_BY = "key_sortBy";
-    public static final String KEY_SORTED_MOVIES = "key_movieList";
     public static final String KEY_SPINNER_VALUE = "key_spinnerValue";
 
     private String sortBy = SORT_POPULAR;
@@ -69,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements MovieListener, Ad
 
         resetData();
         setupRecyclerView();
-        selectedPosition = getSort();
+        mSortMethod = getSort();
     }
 
     private void resetData() {
@@ -82,9 +89,10 @@ public class MainActivity extends AppCompatActivity implements MovieListener, Ad
     }
 
     private void setupRecyclerView() {
+        int columns = getColumns();
         mMovies = new ArrayList<>();
-        mAdapter = new MovieAdapter(mMovies, this);
-        GridAutofitLayoutManager mLayoutManager = new GridAutofitLayoutManager(this, 300);
+        mAdapter = new MovieAdapter(mMovies, this, this);
+        mLayoutManager = new GridLayoutManager(this, columns);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
     }
@@ -108,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements MovieListener, Ad
         menuAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
         mSpinner.setAdapter(menuAdapter);
         mSpinner.setOnItemSelectedListener(this);
-        mSpinner.setSelection(selectedPosition);
+        mSpinner.setSelection(mSortMethod);
 
         return true;
     }
@@ -182,9 +190,14 @@ public class MainActivity extends AppCompatActivity implements MovieListener, Ad
                         MovieResponse jsonResponse = response.body();
                         List<Movie> movie = jsonResponse.getResults();
 
+                        mMovies.clear();
                         mMovies.addAll(movie);
                         mAdapter.notifyItemInserted(mMovies.size() - 1);
                         mAdapter.notifyDataSetChanged();
+                        if (mAdapterPosition != 0) {
+                            mRecyclerView.scrollToPosition(mAdapterPosition);
+                            mAdapterPosition = 0;
+                        }
                     }
                 }
 
@@ -207,9 +220,14 @@ public class MainActivity extends AppCompatActivity implements MovieListener, Ad
                         MovieResponse jsonResponse = response.body();
                         List<Movie> movie = jsonResponse.getResults();
 
+                        mMovies.clear();
                         mMovies.addAll(movie);
                         mAdapter.notifyItemInserted(mMovies.size() - 1);
                         mAdapter.notifyDataSetChanged();
+                        if (mAdapterPosition != 0) {
+                            mRecyclerView.scrollToPosition(mAdapterPosition);
+                            mAdapterPosition = 0;
+                        }
                     }
                 }
 
@@ -227,12 +245,11 @@ public class MainActivity extends AppCompatActivity implements MovieListener, Ad
         this.mMovies.addAll(movies);
     }
 
-        @Override
+    @Override
     protected void onResume() {
-        Log.v("MainActivity", "-->onStop getSort(): " + getSort());
         super.onResume();
-            selectedPosition = getSort();
-            switch (selectedPosition) {
+            mSortMethod = getSort();
+            switch (mSortMethod) {
                 case 0:
                     sortBy = SORT_POPULAR;
                     if (NetworkUtils.checkConnection(this)) {
@@ -259,22 +276,44 @@ public class MainActivity extends AppCompatActivity implements MovieListener, Ad
                     break;
             }
 
+        if (mBundleViewState != null) {
+            Parcelable listState = mBundleViewState.getParcelable(KEY_LAYOUT_STATE);
+            mRecyclerView.getLayoutManager().onRestoreInstanceState(listState);
+        }
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        mBundleViewState = new Bundle();
+        Parcelable listState = mRecyclerView.getLayoutManager().onSaveInstanceState();
+        mBundleViewState.putParcelable(KEY_LAYOUT_STATE, listState);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        Log.v("MainActivity", "-->onStop getSort(): " + getSort());
         super.onSaveInstanceState(outState);
-        outState.putString(KEY_SORT_BY, sortBy);
-        outState.putParcelable(KEY_SORTED_MOVIES, mRecyclerView.getLayoutManager().onSaveInstanceState());
+        mState = mRecyclerView.getLayoutManager().onSaveInstanceState();
+        outState.putParcelable(KEY_LAYOUT_STATE, mState);
+        outState.putInt(KEY_ADAPTER_POSITION, mLayoutManager.findFirstCompletelyVisibleItemPosition());
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
+    protected void onRestoreInstanceState(Bundle state) {
+        super.onRestoreInstanceState(state);
+        if (state != null) {
+            mState = state.getParcelable(KEY_LAYOUT_STATE);
+            mAdapterPosition = state.getInt(KEY_ADAPTER_POSITION);
+        }
+    }
 
-        if (savedInstanceState != null) {
-            selectedPosition = getSort();
+    public int getColumns() {
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            return 4;
+        } else {
+            return 2;
         }
     }
 

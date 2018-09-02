@@ -1,5 +1,6 @@
 package com.example.android.popularmoviesstage2.adapters;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -22,19 +23,19 @@ public class MovieAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private static final String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
     private static final String SIZE = "w185";
     private final MovieListener mClickListener;
+    private final LayoutInflater mInflater;
     final private List<Movie> movies;
 
-    public MovieAdapter(List<Movie> movies, MovieListener listener) {
+    public MovieAdapter(List<Movie> movies, MovieListener listener, Context context) {
         this.movies = movies;
         this.mClickListener = listener;
+        this.mInflater = LayoutInflater.from(context);
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.grid_item, parent, false);
-
+        View view = mInflater.inflate(R.layout.grid_item, parent, false);
         return new MovieHolder(view);
     }
 

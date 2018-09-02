@@ -16,17 +16,9 @@ public class Review implements Parcelable {
     @SerializedName("content")
     private String mContent;
 
-    public Review() {
-
-    }
-
     //Setter methods
     public void setId(String id) {
         mId = id;
-    }
-
-    public void setAuthor(String author) {
-        mAuthor = author;
     }
 
     public void setContent(String content) {
